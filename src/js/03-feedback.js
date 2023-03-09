@@ -6,13 +6,13 @@ const input = document.querySelector('input');
 const STORAGE_KEY = 'feedback-form-state';
 const formData = {};
 
-populatemessage();
+
 
 form.addEventListener('submit', onFormSubmit);
 form.addEventListener('input', throttle(onmessageInput, 500));
 
 function onmessageInput() {
-  // formData[e.target.name] = e.target.value; Видаляє іньше поле після перезавантаження
+  // formData[e.target.name] = e.target.value; Видаляє значення іньшого поля після перезавантаження сторінки
   const formData = { email: input.value, message: message.value };
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
@@ -25,12 +25,20 @@ function onFormSubmit(e) {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-function populatemessage() {
-  const savedDataForm = localStorage.getItem(STORAGE_KEY);
-  const parsSavedDataForm = JSON.parse(savedDataForm);
-
-  if (savedDataForm) {
-    input.value = parsSavedDataForm.email;
-    message.value = parsSavedDataForm.message;
+// Перевірка чи валідний JSON
+const chekKey = key => {
+  try {
+    const savedDataForm = localStorage.getItem(key);
+    return savedDataForm === null ? undefined : JSON.parse(savedDataForm);
+  } catch (error) {
+    console.error('Get state error: ', error.message);
   }
-}
+};
+
+// Запис у форму якщо є у Lokal Storage данні
+  const chekedDataForm = chekKey(STORAGE_KEY)
+  if (chekedDataForm) {
+    input.value = chekedDataForm.email;
+    message.value = chekedDataForm.message;
+};
+

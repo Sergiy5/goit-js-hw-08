@@ -1,41 +1,17 @@
 import Player from '@vimeo/player';
 import throttle from 'lodash.throttle';
 
+const DATA_KEY = 'videoplayer-current-time';
 const iframe = document.querySelector('iframe');
 const player = new Player(iframe);
-const plaeyrCurrentTime = localStorage.getItem('videoplayer-current-time');
-const parsPlaeyrCurrentTime = JSON.parse(plaeyrCurrentTime);
 
-playerStartTime();
 
-  player.on(
-    'timeupdate',
-    throttle(function (data) {
-      localStorage.setItem('videoplayer-current-time', JSON.stringify(data));
-    }, 1000),
-    
-  );
+const saveLocalData = function (data) {
+  localStorage.setItem(DATA_KEY, data.seconds)};
 
-function playerStartTime() {
+player.on('timeupdate', throttle(saveLocalData, 1000));
 
-  if (plaeyrCurrentTime) {
-    const dataTime = parsPlaeyrCurrentTime.seconds;
-    
-    player
-      .setCurrentTime(dataTime)
-      .then(function (seconds) {
-        // seconds = the actual time that the player seeked to
-      })
-      .catch(function (error) {
-        switch (error.name) {
-          case 'RangeError':
-            // the time was less than 0 or greater than the video’s duration
-            break;
 
-          default:
-            // some other error occurred
-            break;
-        }
-      });
-  }
-};
+//    Встановлення часу зі сховища або якщо нема збережених данних тоді '0'
+player.setCurrentTime(JSON.parse(localStorage.getItem(DATA_KEY)) || 0);
+     
